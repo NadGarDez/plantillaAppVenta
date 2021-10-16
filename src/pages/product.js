@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from "react"
+import React,{useState,useEffect,useRef} from "react"
 
 import { View, Text, Image,Dimensions ,Alert,ScrollView,TextInput} from 'react-native'
 import Bar from "../components/headerBack.js"
@@ -10,13 +10,78 @@ import {w,h} from "../utilities/sizes.js"
 import Icon from "react-native-vector-icons/FontAwesome"
 import Opinion from "../components/opinion.js"
 import Tab from "../components/tabBar.js"
+import {setToken,unsetTokenm,selectToken} from "../reduxFiles/sessionSlice.js"
+import {setProduct,unset,unsetAll,selectProducts} from "../reduxFiles/carSlice.js"
+import { useSelector, useDispatch } from 'react-redux'
+import store from "../reduxFiles/store.js"
+import fm from "../utilities/fetchManager.js"
+import config from "../../config.js"
 
 
 let ancho = Dimensions.get('window').width
 let anchoComponente = (50*ancho)/100;
-const Element = ({navigation,route,store})=>{
-  console.log("hola mundo")
-  let {item} = route.params
+const Element = ({navigation,route})=>{
+  useEffect(
+    ()=>{
+      if (search == true) {
+        getProduct()
+        setSearch(false)
+      }
+    }
+  )
+
+
+  const dispatch = useDispatch()
+  const [search,setSearch] = useState(true)
+  const [item,setItem] = useState([0])
+  const [requiredAmount,setRequiredAmount] = useState("1")
+  let amountRef = useRef(null)
+  const Stars = (props)=>{
+    const component = []
+
+    for (var i = 0; i < 5; i++) {
+      let aux = ""
+      if (i<=props.calification-1) {
+        aux = (<Icon name="star" color={colors.principal} size={20} style={{margin:5}}/>)
+      }
+      else {
+        aux = (<Icon name="star" color={colors.second} size={20} style={{margin:5}}/>)
+      }
+      component.push(aux)
+    }
+    return component
+  }
+
+  const getProduct = async ()=>{
+    let params = getFilters()
+
+
+
+    let a = new fm(config.host,params)
+    const token = selectToken(store.getState())
+    try{
+        const result = await a.getJson(params,token)
+        console.log(result)
+        setItem(result)
+    }
+    catch(e){
+      console.log(e)
+    }
+
+
+  }
+
+  const getFilters = ()=>{
+    let obj ={
+      id:route.params.id,
+      typeProjection:"publication",
+      limitStart:0,
+      matchType:"noMatch"
+    }
+
+    return `/p/${obj.id}/${obj.typeProjection}/${obj.typeOrder}/${obj.limitStart}/${obj.matchType}/${obj.matchKey}/${obj.matchValue}`
+  }
+
   let styles={
     padre:{
       padding:7,
@@ -103,27 +168,63 @@ const Element = ({navigation,route,store})=>{
         <View style={[flex.Column,flex.Wrap,{backgroundColor:colors.principal,width:"100%",padding:5}]}>
           <View style={[flex.column,{backgroundColor:colors.customWhite,width:"100%",padding:5,borderRadius:3,marginBottom:5}]}>
 
-            <Image source={{uri:item.image}} resizeMode="stretch" style={[h(22),{width:"100%"}]} />
+            <Image source={{uri:item[0].image}} resizeMode="stretch" style={[h(22),{width:"100%"}]} />
             <View style={styles.titulo}>
               <Text style={[fonts.type.f1,fonts.size.gigant]}>
-                {item.title}
+                {item[0].title}
               </Text>
             </View>
             <View style={[flex.Column,flex.VerticalCenter,flex.wrap]}>
-              <Text style={[fonts.size.big,fonts.type.f4,{color:colors.gold}]}>{item.price}</Text>
-              <Text style={[fonts.type.f1,{color:colors.grey}]}>Vendido por {item.seller} </Text>
+              <Text style={[fonts.size.big,fonts.type.f4,{color:colors.gold}]}>{item[0].price}</Text>
+              <Text style={[fonts.type.f1,{color:colors.grey}]}>Vendido por {item[0].seller} </Text>
             </View>
             <View style={[flex.Row,flex.HorizontalCenter,h(10)]}>
               <Text style={[fonts.type.f3,{color:colors.grey,marginRight:5}]}>Cantidad</Text>
-              <TextInput value="1" style={[fonts.type.f3,{height:30,color:colors.grey,marginRight:5,borderStyle:"solid",borderColor:"black",borderWidth: 1,borderRadius:5,padding:0,textAlign:"center"}]}/>
-              <Text style={[fonts.type.f3,{color:colors.grey}]}>Disponible 50</Text>
+              <TextInput
+                value={requiredAmount}
+                ref={amountRef}
+                style={[fonts.type.f3,{height:30,color:colors.grey,marginRight:5,borderStyle:"solid",borderColor:"black",borderWidth: 1,borderRadius:5,padding:0,textAlign:"center"}]}
+                onChangeText={
+                  text => {
+                    console.log(text)
+                    if (parseInt(text) <= item[0].stock || text == "" ) {
+
+                      setRequiredAmount(text)
+
+                    }
+                    else{
+                      console.log("mayor")
+                    }
+                  }
+                }
+
+                keyboardType="numeric"
+              />
+              <Text style={[fonts.type.f3,{color:colors.grey}]}>Disponible {item[0].stock}</Text>
             </View>
             <View style={[flex.Row,h(10),{width:"100%"}]}>
               <View style={[flex.PerfectCenter,{width:"50%"}]}>
                 <NadBoton width={45} title="Agregar al carrito"
                   action={
                     ()=>{
-                      item.navigation.navigate("product",{item:item})
+                      if (parseInt(requiredAmount) > 0 && amountRef.current.value !== "" ) {
+                        let obj = {
+                          id:item[0]._id,
+                          title:item[0].title,
+                          seller:item[0].seller,
+                          price:item[0].price,
+                          amount:parseInt(requiredAmount),
+                          image:item[0].image
+                        }
+                        dispatch(setProduct(obj))
+                        console.log(selectProducts(store.getState()))
+                        console.log(store.getState())
+                      }
+                      else{
+                        Alert.alert("Cantidad de producto invalido");
+                      }
+
+
                     }
                   }
                 />
@@ -145,8 +246,7 @@ const Element = ({navigation,route,store})=>{
               </View>
               <View style={[flex.wrap]}>
                 <Text style={[fonts.type.f3,fonts.size.small, {flexDirection:'row',flexWrap: 'wrap',textAlign:"justify",padding:5}]}>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
+                {item[0].description}
                 </Text>
               </View>
 
@@ -160,11 +260,7 @@ const Element = ({navigation,route,store})=>{
               <Text style={[fonts.type.f4,fonts.size.medium]}>Calificacion de este producto</Text>
             </View>
             <View style={[flex.Row,flex.PerfectCenter,{padding:10}]}>
-              <Icon name="star" color={colors.principal} size={20} style={{margin:5}}/>
-              <Icon name="star" color={colors.principal} size={20} style={{margin:5}}/>
-              <Icon name="star" color={colors.principal} size={20} style={{margin:5}}/>
-              <Icon name="star" color={colors.principal} size={20} style={{margin:5}}/>
-              <Icon name="star" color={colors.second} size={20} style={{margin:5}}/>
+              <Stars calification={item[0].calificacion}/>
             </View>
             <View style={[flex.PerfectCenter,{padding:10}]}>
               <Text style={[fonts.type.f4,fonts.size.medium]}>Opiniones</Text>

@@ -1,5 +1,5 @@
-import React, {Component} from "react"
-import {View,StatusBar,Text,ScrollView,ImageBackground,Image,TouchableOpacity} from "react-native"
+import React, {Component,useState,useEffect} from "react"
+import {View,StatusBar,Text,ScrollView,ImageBackground,Image,TouchableOpacity,Alert} from "react-native"
 import {Input} from "react-native-elements"
 import Button from "../components/buttonNad.js"
 import LinearGradient from 'react-native-linear-gradient';
@@ -10,12 +10,47 @@ const {fonts} = require("../styles/fonts.js")
 const {colors}=require("../styles/colors.js")
 import {w,h} from "../utilities/sizes.js"
 import Bar from "../components/headerSolo.js"
-export default class Login extends Component{
-  constructor(props){
-    super(props)
-  }
+import cf from "../utilities/fetchManager.js"
+import config from "../../config.js"
 
-  render(){
+const component = ({navigation,route})=>{
+
+    let [user,setUser] = useState("")
+    let [email,setEmail] = useState("")
+    let [password1,setPassword1] = useState("")
+    let [password2,setPassword2] = useState("")
+
+    let signIn = async ()=>{
+      if(password1 == password2){
+        console.log("iguales")
+        try{
+          let a = new cf(`${config.host}/createUser`)
+          let body = {
+            user:user,
+            email:email,
+            pass:password1
+          }
+
+          let result =await a.postJson(body)
+          if(!result.error){
+            Alert.alert(JSON.stringify("Ahora ingrese al login"))
+            navigation.navigate("Login")
+
+          }
+          else{
+            Alert.alert(result.error)
+          }
+        }
+        catch(err){
+          console.log(err)
+        }
+
+      }
+      else{
+        Alert.alert("contraceñas no coinciden")
+      }
+    }
+
     return(
       <View>
         <StatusBar backgroundColor={colors.second}/>
@@ -35,16 +70,36 @@ export default class Login extends Component{
                 <Text style={[fonts.type.f3,{color:colors.second,fontSize:30}]}>SignIn</Text>
               </View>
               <View style={[{width:"100%"}, h(10),flex.PerfectCenter]}>
-                <Input placeholder="Nombre de usuario"/>
+                <Input placeholder="Nombre de usuario"
+                  onChangeText={
+                    text => setUser(text)
+
+                  }
+
+                />
               </View>
               <View style={[{width:"100%"}, h(10),flex.PerfectCenter]}>
-                <Input placeholder="Email"/>
+                <Input placeholder="Email"
+                  onChangeText = {
+                    text => setEmail(text)
+                  }
+                />
               </View>
               <View style={[{width:"100%"}, h(10),flex.PerfectCenter]}>
-                <Input placeholder="Password" secureTextEntry={true} />
+                <Input placeholder="Password" secureTextEntry={true}
+                  onChangeText = {
+                    text => setPassword1(text)
+                  }
+
+                />
               </View>
               <View style={[{width:"100%"}, h(10),flex.PerfectCenter]}>
-                <Input placeholder="Repit Password" secureTextEntry={true} />
+                <Input placeholder="Repit Password" secureTextEntry={true}
+                  onChangeText = {
+                    text => setPassword2(text)
+                  }
+
+                 />
               </View>
 
               <View style={[{width:"100%"}, h(10),flex.PerfectCenter]}>
@@ -53,7 +108,7 @@ export default class Login extends Component{
                   width={80} title="Enviar"
                     action={
                       ()=>{
-                        console.log("hola")
+                        signIn()
                       }
                     }
                 />
@@ -65,7 +120,7 @@ export default class Login extends Component{
                 <TouchableOpacity
                   onPress={
                     ()=>{
-                      this.props.navigation.navigate("Login")
+                      navigation.navigate("Login")
                     }
                   }
                 >
@@ -84,5 +139,7 @@ export default class Login extends Component{
         </ScrollView >
       </View>
     )
-  }
+
 }
+
+export default component

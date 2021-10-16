@@ -18,6 +18,7 @@ import {Provider} from "react-redux"
 const {colors}=require("../styles/colors.js")
 const {flex} = require("../styles/flex.js")
 import {setToken,unsetTokenm,selectToken,} from "../reduxFiles/sessionSlice.js"
+import Animation from "./pruebaAnimation.js"
 
 const Stack = createStackNavigator();
 
@@ -31,7 +32,7 @@ export default class App extends Component {
   }
   render(){
 
-    console.log("estado",store.getState())
+    console.log("estado",selectToken(store.getState()))
 
     return(
 
@@ -47,14 +48,29 @@ export default class App extends Component {
                 >
                   {
 
-                      selectToken(store)==1?
+                      selectToken(store.getState())==null?
                       <>
-                        <Stack.Screen name="Login" component={Login}/>
-                        <Stack.Screen name="SignIn" component={SignIn} />
+
+                        <Stack.Screen name="Login" component={Login}
+                          initialParams={
+                            {
+                              refresh:()=>this.forceUpdate()
+                            }
+                          }
+
+                        />
+                        <Stack.Screen name="SignIn" component={SignIn}
+
+                        />
                       </>
                       :
                       <>
                         <Stack.Screen component={Home} name="Home"
+                          initialParams={
+                            {
+                              refresh:()=>this.forceUpdate()
+                            }
+                          }
                           options={{
                             headerStyle: [{
                               backgroundColor: "#c5bef4",
@@ -85,3 +101,4 @@ export default class App extends Component {
 
 
 }
+/*<Stack.Screen name="movil" component={Animation} />*/

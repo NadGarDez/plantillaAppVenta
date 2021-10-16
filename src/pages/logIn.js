@@ -1,21 +1,71 @@
-import React, {Component} from "react"
+import React, {Component,useState,useEffect,useCallback} from "react"
 import {View,StatusBar,Text,ScrollView,ImageBackground,Image,TouchableOpacity} from "react-native"
 import {Input} from "react-native-elements"
 import Button from "../components/buttonNad.js"
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from "react-native-vector-icons/FontAwesome"
+import { useSelector, useDispatch } from 'react-redux'
 import Footer from "../components/footer.js"
 const {flex} = require("../styles/flex.js")
 const {fonts} = require("../styles/fonts.js")
 const {colors}=require("../styles/colors.js")
 import {w,h} from "../utilities/sizes.js"
 import Bar from "../components/headerSolo.js"
-export default class Login extends Component{
-  constructor(props){
-    super(props)
+import cf from "../utilities/fetchManager.js"
+import config from "../../config.js"
+import {setToken,unsetTokenm,selectToken} from "../reduxFiles/sessionSlice.js"
+import store from "../reduxFiles/store.js"
+
+
+
+const component = ({navigation,route})=>{
+  let refresh = route.params.refresh
+  const [user,setUser]=useState("")
+  const [pass,setPass]=useState("")
+  const [,updateState]=useState()
+  const dispatch = useDispatch()
+  const force = useCallback(
+    ()=>updateState({}),
+    []
+  )
+  useEffect(
+    ()=>{
+      console.log(selectToken(store.getState()))
+      if(selectToken(store.getState())!=null){
+
+        navigation.navigate("Home")
+
+      }
+    }
+  )
+
+
+  const login = async (user,pass)=>{
+    let body={
+      user:user,
+      pass:pass
+    }
+    try{
+      let a = new cf(`${config.host}/auth`)
+      console.log(a)
+      let result =await a.postJson(body)
+      if(!result.error){
+
+        dispatch(setToken(result.token))
+        refresh()
+
+      }
+      else{
+        dispatch(setToken(null))
+      }
+    }
+    catch(err){
+      console.log(err)
+
+    }
+
   }
 
-  render(){
     return(
       <View>
         <StatusBar backgroundColor={colors.second}/>
@@ -35,10 +85,18 @@ export default class Login extends Component{
                 <Text style={[fonts.type.f3,{color:colors.second,fontSize:30}]}>Login</Text>
               </View>
               <View style={[{width:"100%"}, h(10),flex.PerfectCenter]}>
-                <Input placeholder="Email o Usuario"/>
+                <Input placeholder="Email o Usuario"
+                  onChangeText={
+                    text => setUser(text)
+                  }
+                />
               </View>
               <View style={[{width:"100%"}, h(10),flex.PerfectCenter]}>
-                <Input placeholder="Password" secureTextEntry={true} />
+                <Input placeholder="Password" secureTextEntry={true}
+                  onChangeText={
+                    text => setPass(text)
+                  }
+                />
               </View>
 
               <View style={[{width:"100%"}, h(10),flex.PerfectCenter]}>
@@ -47,7 +105,7 @@ export default class Login extends Component{
                   width={80} title="Enviar"
                     action={
                       ()=>{
-
+                        login(user,pass)
                       }
                     }
                 />
@@ -59,7 +117,7 @@ export default class Login extends Component{
                 <TouchableOpacity
                   onPress={
                     ()=>{
-                        this.props.navigation.navigate("SignIn")
+                        navigation.navigate("SignIn")
                     }
                   }
                 >
@@ -78,5 +136,7 @@ export default class Login extends Component{
         </ScrollView >
       </View>
     )
-  }
+
 }
+
+export default component

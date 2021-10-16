@@ -11,6 +11,7 @@ import Conversation from "./conversation.js"
 import Icon from "react-native-vector-icons/FontAwesome"
 import User from "./user.js"
 import Notification from "./notificaciones.js"
+
 let Stack = createStackNavigator()
 let StackProducts = createStackNavigator()
 let StackShoping = createStackNavigator()
@@ -26,6 +27,7 @@ const Sproducts = (props)=>{
         }
       }
     >
+      
       <StackProducts.Screen name="products" component={Products} />
       <StackProducts.Screen name="product" component={Product} />
     </StackProducts.Navigator>
@@ -70,7 +72,7 @@ export default class Home extends Component{
   }
 
   render(){
-    console.log(this.props.store)
+    console.log(this.props.route.params)
     return(
 
         <Stack.Navigator
@@ -83,7 +85,13 @@ export default class Home extends Component{
           <Stack.Screen component={Sproducts} name="Productos" />
           <Stack.Screen component={Sshoping} name="Carrito" />
           <Stack.Screen component={Schat} name="Chat" />
-          <Stack.Screen component={User} name="Usuario" />
+          <Stack.Screen component={User} name="Usuario"
+            initialParams={
+              {
+                refresh:this.props.route.params.refresh
+              }
+            }
+          />
           <Stack.Screen component={Notification} name="Notificaciones" />
         </Stack.Navigator>
 

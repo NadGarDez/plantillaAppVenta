@@ -67,7 +67,7 @@ const Element = ({item})=>{
             <NadBoton width={80} title="detalles"
               action={
                 ()=>{
-                  item.navigation.navigate("product",{item:item})
+                  item.navigation.navigate("product",{id:item._id})
                 }
               }
             />
