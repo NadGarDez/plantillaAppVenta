@@ -1,1 +1,1 @@
-no hay readme ?
+Esta es una plantilla de venta
