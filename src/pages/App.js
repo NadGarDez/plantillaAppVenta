@@ -32,7 +32,7 @@ export default class App extends Component {
   }
   render(){
 
-    console.log("estado",selectToken(store.getState()))
+  //  console.log("estado",selectToken(store.getState()))
 
     return(
 

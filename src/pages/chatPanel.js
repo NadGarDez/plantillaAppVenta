@@ -11,14 +11,39 @@ const {flex} = require("../styles/flex.js")
 const {fonts} = require("../styles/fonts.js")
 const {colors}=require("../styles/colors.js")
 import {w,h} from "../utilities/sizes.js"
+import config from "../../config.js"
+import io from 'socket.io-client/dist/socket.io.js';
 
+
+const con = io('ws://127.0.0.1:7070/', {reconnect: true, transports: ["websocket"],
+  withCredentials: true,
+  extraHeaders: {
+    "my-custom-header": "abcd"
+  }
+});
 
 const component = (props)=>{
   let selector = useSelector(selectToken)
   let dispatch = useDispatch()
-  useEffect(() => {
-    console.log(selector)
-  });
+  useEffect(
+    ()=>{
+
+    }
+  )
+
+  con.on("connect_error", (err) => {
+    console.log(err)
+   console.log(`connect_error due to ${err.message}`);
+});
+
+  con.on(
+    "connect",
+    ()=>{
+      console.log("conectaadaaaaado")
+      con.send("hello");
+    }
+  )
+  //console.log(socket.connect, "socketttttttttttttttttttttt")
 
   let opiniones = [
     {

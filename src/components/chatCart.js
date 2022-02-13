@@ -10,7 +10,6 @@ const {colors}=require("../styles/colors.js")
 import {w,h} from "../utilities/sizes.js"
 
 const Component = ({item,navigation})=>{
-  console.log(item)
   const {foto,mensaje, nombre, fecha} = item
   return(
     <TouchableOpacity

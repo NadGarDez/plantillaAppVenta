@@ -4,7 +4,7 @@ export const sessionSlice = createSlice(
   {
     name: "token",
     initialState:{
-      token:1
+      token:null
     },
     reducers:{
       setToken: (state,action)=>{

@@ -23,9 +23,7 @@ const component = ({navigation})=>{
   let selector = useSelector(selectToken)
   let dispatch = useDispatch()
   let [displaTab,setDisplayTap] = useState(true)
-  useEffect(() => {
-    console.log(selector)
-  });
+
 
   let mensajes = [
     {
