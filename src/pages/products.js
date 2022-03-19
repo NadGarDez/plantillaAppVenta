@@ -38,6 +38,7 @@ const component = (props)=>{
     const token = selectToken(store.getState())
     try{
         const result = await a.getJson(params,token)
+        console.log(result, 'resultado')
         result.forEach((item, i) => {
           item["navigation"] = props.navigation
         });

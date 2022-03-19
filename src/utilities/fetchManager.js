@@ -12,7 +12,7 @@ export default class FetchManager{
 
   async getJson(params,auth=null){
     let options = {
-      method:"get",
+      method:"GET",
       headers:{
         "Content-Type":"application/json",
         "Authorization":`Bearer ${auth}`
@@ -20,7 +20,10 @@ export default class FetchManager{
     }
     return new Promise(
       (resolve,reject)=>{
-        fetch(`${this.url+params}`)
+        fetch(
+          `${this.url+params}`,
+          options
+        )
         .then(res => resolve(res.json()))
         .catch(error => reject("Error:",error))
       }

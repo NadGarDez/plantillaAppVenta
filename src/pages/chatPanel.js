@@ -1,48 +1,23 @@
-import React, {Component} from "react"
-import {View,StatusBar,Text,Button,FlatList} from "react-native"
+import React, { useContext} from "react"
+import {View,FlatList} from "react-native"
 import {useSelector,useDispatch} from "react-redux"
-import {useEffect,useSate} from "react"
-import {setToken,unsetTokenm,selectToken} from "../reduxFiles/sessionSlice.js"
+import {selectToken} from "../reduxFiles/sessionSlice.js"
 import Bar from "../components/headerSolo.js"
 import CartChat from "../components/chatCart.js"
-import Footer from "../components/footer.js"
 import Tab from "../components/tabBar.js"
 const {flex} = require("../styles/flex.js")
-const {fonts} = require("../styles/fonts.js")
 const {colors}=require("../styles/colors.js")
-import {w,h} from "../utilities/sizes.js"
-import config from "../../config.js"
-import io from 'socket.io-client/dist/socket.io.js';
-
-
-const con = io('ws://127.0.0.1:7070/', {reconnect: true, transports: ["websocket"],
-  withCredentials: true,
-  extraHeaders: {
-    "my-custom-header": "abcd"
-  }
-});
+import { WebSocketContext } from "../components/WebSocketPovider.js"
 
 const component = (props)=>{
-  let selector = useSelector(selectToken)
-  let dispatch = useDispatch()
-  useEffect(
-    ()=>{
 
-    }
-  )
+  const socketContext = useContext(WebSocketContext);
+  console.log(socketContext);
 
-  con.on("connect_error", (err) => {
-    console.log(err)
-   console.log(`connect_error due to ${err.message}`);
-});
+  
+  let dispatch = useDispatch();
 
-  con.on(
-    "connect",
-    ()=>{
-      console.log("conectaadaaaaado")
-      con.send("hello");
-    }
-  )
+
   //console.log(socket.connect, "socketttttttttttttttttttttt")
 
   let opiniones = [
