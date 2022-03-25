@@ -4,6 +4,7 @@ export default class FetchManager{
   constructor(url){
     this.url = url
     this.postJson = this.postJson.bind(this)
+    this.getJson = this.getJson.bind(this)
   }
 
   async getText(auth=null){

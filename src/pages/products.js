@@ -1,16 +1,13 @@
-import React, {Component,useEffect,useState} from "react"
-import {View,StatusBar,Text,FlatList} from "react-native"
-import {Imput,Header} from "react-native-elements"
-import { useSelector, useDispatch } from 'react-redux'
-import { createStackNavigator } from '@react-navigation/stack';
-const Stack = createStackNavigator();
+import React, {useEffect,useState} from "react"
+import {View,StatusBar,FlatList} from "react-native"
+
 import Product from "../components/cardProduct.js"
 import Tab from "../components/tabBar.js"
 import HeaderSolo from "../components/headerSolo.js"
 const {colors}=require("../styles/colors.js")
 import config from "../../config.js"
-import {w,h} from "../utilities/sizes.js"
-import {setToken,unsetTokenm,selectToken} from "../reduxFiles/sessionSlice.js"
+import {h} from "../utilities/sizes.js"
+import {selectToken} from "../reduxFiles/sessionSlice.js"
 import store from "../reduxFiles/store.js"
 import fm from "../utilities/fetchManager.js"
 

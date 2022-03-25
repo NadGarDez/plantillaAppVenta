@@ -232,8 +232,17 @@ const Element = ({navigation,route})=>{
               <View style={[flex.PerfectCenter,{width:"50%"}]}>
                 <NadBoton width={45} title="consultar al vendedor"
                   action={
-                    ()=>{
-
+                    ()=>{ 
+                      console.log(item[0], "item object")
+                      navigation.navigate("Chat",{
+                        screen:'conversation',
+                        params:{
+                          partnerId:item[0].idUser
+                        }
+                        
+                      })
+                      // the id of the product creator is in the product object
+                      // here we have to go to a new conversation and send the id param to the servidor 
                     }
                   }
                 />
