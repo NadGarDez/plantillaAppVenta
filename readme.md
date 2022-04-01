@@ -16,7 +16,7 @@ This is a personal project, however you are free to leave your contribution.
 (Is needed complete the backend instalation) link here [ApiCoromar](https://github.com/NadGarDez/apiCoromar).
 
 ```sh
-cd dillinger
+cd plantillaAppVenta
 npm i
 npm start 
 npm run android # in other console instance
