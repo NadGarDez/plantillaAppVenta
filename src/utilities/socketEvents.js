@@ -1,23 +1,47 @@
-import { Alert } from "react-native";
+import { socketEventSelect } from "../reduxFiles/socketEventSllice";
+import store from "../reduxFiles/store";
+import { saveMessage } from "./db/dbManager";
 
-const socketEvents = (socket)=>{
+
+const socketEvents = (socket, dispatch)=>{
     socket.on(
         "connect",
         ()=>{
-            console.log('conectadoooooooooooooooooo');
-           
+           dispatch(
+               {
+                   name:'debug/connect',
+                   time: new Date().getTime()
+               }
+           )
         }
     )
-
-    socket.emit("test_message", "hey");
 
     socket.on(
-        'test_message',
-        (text)=>{
-            console.log(`the server says: ${text}`);
-            Alert.alert(`the server says: ${text}`)
+        "chat/message",
+        (objectMessage)=>{
+            let result;
+            try {
+                result = saveMessage(objectMessage.data);
+                if (result.status === 'error') {
+                    throw result.data;
+                }
+                else {
+                    console.log(socketEventSelect(store.getState()));
+                    dispatch(
+                        {
+                            name:'chat/message',
+                            time: new Date().getTime()
+                        }
+                    )
+                }
+            } catch (error) {
+                console.log(error);
+            }
+            
+            
         }
     )
+
 
     return socket
 

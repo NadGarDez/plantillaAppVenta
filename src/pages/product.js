@@ -10,12 +10,13 @@ import {w,h} from "../utilities/sizes.js"
 import Icon from "react-native-vector-icons/FontAwesome"
 import Opinion from "../components/opinion.js"
 import Tab from "../components/tabBar.js"
-import {setToken,unsetTokenm,selectToken} from "../reduxFiles/sessionSlice.js"
-import {setProduct,unset,unsetAll,selectProducts} from "../reduxFiles/carSlice.js"
-import { useSelector, useDispatch } from 'react-redux'
+import {selectToken} from "../reduxFiles/sessionSlice.js"
+import {setProduct,selectProducts} from "../reduxFiles/carSlice.js"
+import {  useDispatch } from 'react-redux'
 import store from "../reduxFiles/store.js"
 import fm from "../utilities/fetchManager.js"
 import config from "../../config.js"
+import { selectId } from "../reduxFiles/idSlice.js"
 
 
 let ancho = Dimensions.get('window').width
@@ -30,7 +31,7 @@ const Element = ({navigation,route})=>{
     }
   )
 
-
+  
   const dispatch = useDispatch()
   const [search,setSearch] = useState(true)
   const [item,setItem] = useState([0])
@@ -237,7 +238,8 @@ const Element = ({navigation,route})=>{
                       navigation.navigate("Chat",{
                         screen:'conversation',
                         params:{
-                          partnerId:item[0].idUser
+                          partnerId:item[0].idUser,
+                          group_member:`${selectId(store.getState())}-${item[0].idUser}`
                         }
                         
                       })

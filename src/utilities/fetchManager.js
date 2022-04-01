@@ -41,7 +41,7 @@ export default class FetchManager{
       body:JSON.stringify(body),
       headers:{
         "Content-Type":"application/json",
-
+        "Authorization":`Bearer ${auth}`
       }
 
     }

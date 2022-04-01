@@ -1,5 +1,5 @@
 import React from "react"
-import {View,ScrollView,TouchableOpacity,KeyboardAvoidingView} from "react-native"
+import {View,ScrollView,TouchableOpacity,KeyboardAvoidingView,Text} from "react-native"
 import {useEffect,useState,useContext} from "react"
 import {Input} from "react-native-elements"
 import Bar from "../components/headerConversation.js"
@@ -10,27 +10,32 @@ import Tab from "../components/tabBar.js"
 const {flex} = require("../styles/flex.js")
 const {colors}=require("../styles/colors.js")
 import {w,h} from "../utilities/sizes.js"
-import { getInformationSeller } from "../utilities/chat/chatUtils.js"
+import { getAllMessages, getInformationPartner, getInformationPartners, } from "../utilities/chat/chatUtils.js"
 import { WebSocketContext } from "../components/WebSocketPovider.js"
-
-
+import { saveUser } from "../utilities/db/dbManager.js"
 
 const component =  ({navigation,route})=>{
   const instanceSocket = useContext(WebSocketContext);
   let [displaTab,setDisplayTap] = useState(true);
   const [messageObject,setMessageObject]=useState({
     toUser:route.params.partnerId,
+    gruop:route.params.gruop,
     type:"",
     content:""
   });
-  const [sellerInformation,setSellerInformation]= useState(null)
+  const [partnerInformation,setParnerInformation]= useState(null);
 
-  console.log(route.params,'params')
 
-  useEffect(
+  useEffect( // cut and paste code of conversation to chat panel file, not here
     async ()=>{
-      const result = await getInformationSeller(route.params.partnerId);
-      setSellerInformation(result.data[0]);
+      const result = await getInformationPartner(route.params.partnerId);
+      try {
+        const result = saveUser(result.data[0]);
+      } catch (error) {
+        
+      }
+      setParnerInformation(result.data[0]);
+
     },
     []
   )
@@ -43,90 +48,10 @@ const component =  ({navigation,route})=>{
   )
   useEffect(
     ()=>{
-      console.log(messageObject);
+    //  console.log(messageObject);
     },
     [messageObject]
   )
-
- 
- // Alert.alert(JSON.stringify(route))
-  let mensajes = [
-    {
-      propietario:false,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:true,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:false,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:true,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:false,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:false,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:true,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:false,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:true,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:false,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:false,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:true,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:false,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:true,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-    {
-      propietario:false,
-      mensaje:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,",
-      fecha:"5/6/2021"
-    },
-  ]
 
   return(
     <KeyboardAvoidingView
@@ -134,15 +59,19 @@ const component =  ({navigation,route})=>{
 
     >
       <View style={[flex.column,{backgroundColor:"white",width:"100%",height:"100%"}]}>
-        <Bar navigation={navigation} name={ sellerInformation!== null ? sellerInformation.user : ""} avatar={ sellerInformation!== null ? sellerInformation.avatar:""}/>
+        <Bar navigation={navigation} name={ partnerInformation!== null ? partnerInformation.user : ""} avatar={ partnerInformation!== null ? partnerInformation.avatar:""}/>
         <ScrollView style={[h(79),{width:"100%"}]}>
           {
+            /*
             mensajes.map(
               (item,index)=>{
                 return item.propietario == true ? <MenssageUser obj={item}/> : <MenssageCollege obj={item}/>
               }
             )
+            */
           }
+
+          <Text>hola</Text>
         </ScrollView>
         <View style={[flex.Row,h(7),{backgroundColor:colors.customWhite}]}>
           <View style={[w(90),{height:"100%"}]}>
@@ -161,8 +90,12 @@ const component =  ({navigation,route})=>{
               }
 
               onChangeText={(text)=>{
+                let copy = {...messageObject};
+                copy.content = text;
+                copy.type = "text";
+                console.log(copy, 'copy')
                 setMessageObject(
-                  {...messageObject,content:text,type:"text"}
+                  copy
                 )
                 instanceSocket.emit("chat/writing", route.params.partnerId);
               }}
@@ -173,7 +106,7 @@ const component =  ({navigation,route})=>{
             <TouchableOpacity style={[flex.PerfectCenter,w(9),{height:w(9).width,borderRadius:w(9).width/2,backgroundColor:colors.principal}]}
               onPress={
                 ()=>{
-                  instanceSocket.emit("chat/message",messageObject.content,messageObject.toUser,messageObject.type);
+                  instanceSocket.emit("chat/message",messageObject.content,messageObject.toUser,messageObject.gruop,messageObject.type);
                   setMessageObject({...messageObject,content:"",type:"text"})
                 }
               }

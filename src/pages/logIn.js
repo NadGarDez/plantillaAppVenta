@@ -15,6 +15,7 @@ import cf from "../utilities/fetchManager.js"
 import config from "../../config.js"
 import {setToken,unsetTokenm,selectToken} from "../reduxFiles/sessionSlice.js"
 import store from "../reduxFiles/store.js"
+import { setId } from "../reduxFiles/idSlice.js";
 
 
 
@@ -52,6 +53,7 @@ const component = ({navigation,route})=>{
       if(!result.error){
 
         dispatch(setToken(result.token))
+        dispatch(setId(result._id));
         refresh()
 
       }
