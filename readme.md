@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-Esta es una plantilla de venta
-=======
 # Coromar App
 ## _Templete to sales App_
 App based powered by React Native framework and some others libraries.
@@ -43,4 +40,3 @@ Only available for development environment
 ## Links
 Backend of that app : [ApiCoromar](https://github.com/NadGarDez/apiCoromar).
 
->>>>>>> develepment
