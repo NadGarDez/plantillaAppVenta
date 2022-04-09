@@ -62,7 +62,6 @@ const Element = ({navigation,route})=>{
     const token = selectToken(store.getState())
     try{
         const result = await a.getJson(params,token)
-        console.log(result)
         setItem(result)
     }
     catch(e){
@@ -187,14 +186,12 @@ const Element = ({navigation,route})=>{
                 style={[fonts.type.f3,{height:30,color:colors.grey,marginRight:5,borderStyle:"solid",borderColor:"black",borderWidth: 1,borderRadius:5,padding:0,textAlign:"center"}]}
                 onChangeText={
                   text => {
-                    console.log(text)
                     if (parseInt(text) <= item[0].stock || text == "" ) {
 
                       setRequiredAmount(text)
 
                     }
                     else{
-                      console.log("mayor")
                     }
                   }
                 }
@@ -218,8 +215,7 @@ const Element = ({navigation,route})=>{
                           image:item[0].image
                         }
                         dispatch(setProduct(obj))
-                        console.log(selectProducts(store.getState()))
-                        console.log(store.getState())
+                       
                       }
                       else{
                         Alert.alert("Cantidad de producto invalido");
@@ -234,7 +230,6 @@ const Element = ({navigation,route})=>{
                 <NadBoton width={45} title="consultar al vendedor"
                   action={
                     ()=>{ 
-                      console.log(item[0], "item object")
                       navigation.navigate("Chat",{
                         screen:'conversation',
                         params:{

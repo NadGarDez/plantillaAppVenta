@@ -2,11 +2,14 @@ import {createSlice} from "@reduxjs/toolkit"
 
 export const socketEventSlice = createSlice(
   {
-    name: "event",
-    initialState:null,
+    name: "socketEvent",
+    initialState:{},
     reducers:{
       setEvent: (state,action)=>{
-        state.event = action.payload
+       return {
+         ...state,
+         socketEvent:action.payload
+       }
       }
     }
   }
@@ -14,7 +17,7 @@ export const socketEventSlice = createSlice(
 
 export const {setEvent} = socketEventSlice.actions
 
-export const socketEventSelect = state => state.event;
+export const socketEventSelect = state => state.socketEvent;
 
 
 export default socketEventSlice.reducer

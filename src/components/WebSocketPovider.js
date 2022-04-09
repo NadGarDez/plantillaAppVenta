@@ -1,4 +1,4 @@
-import React,{createContext} from 'react';
+import React,{createContext, useEffect} from 'react';
 import { selectToken } from '../reduxFiles/sessionSlice';
 import {  useSelector } from 'react-redux';
 import { socketConection } from '../utilities/socketConection';
@@ -8,6 +8,7 @@ import { setEvent } from '../reduxFiles/socketEventSllice';
 const WebSocketContext = createContext(null);
 
 const WebSocketProvider = ({children})=>{
+    
 
     const dispatch = useDispatch();
 
@@ -19,9 +20,19 @@ const WebSocketProvider = ({children})=>{
     let con;
 
     if (token!== null && !con ) {
-        con = socketConection(token,dispatchEvent);
+        con = socketConection(token, dispatchEvent);
     }
 
+
+    useEffect(
+        ()=>{
+            return ()=>{
+                if (con !== null && con!== undefined) {
+                    con.disconnect();
+                }
+            }
+        }
+    )
 
     return (
         <WebSocketContext.Provider value={con}>

@@ -44,7 +44,6 @@ export const createTable = async (name,schema) => {
 };
 
 export const initializeTables = async ()=> {
-    // const a = await trasaction(`DROP TABLE chat`);
   
    // console.log(a);
 
@@ -106,9 +105,14 @@ export const saveUsers = async (arr)=>{
 
 }
 
+export const lastMessageInConversation = async()=>{
+
+} 
+
 export const saveMessage = async (obj)=>{
     const {_id ,content ,fromUser ,toUser ,key, status, type,group_member, create_at} = obj;
-    const query = `INSERT INTO table_name (_id ,content ,fromUser ,toUser ,key, status, type,group_member, create_at) VALUES ('${_id}','${content}', '${fromUser}' , '${toUser}', '${key}', ${status},  '${type}','${group_member}',  ${create_at});`
+    
+    const query = `INSERT INTO chat (_id ,content ,fromUser ,toUser ,key, status, type,group_member, create_at) VALUES ('${_id}','${content}', '${fromUser}' , '${toUser}', '${key}', ${status},  '${type}','${group_member}',  '${create_at}');`
     let result;
     try {
         result = await trasaction(query); 
@@ -122,6 +126,7 @@ export const saveMessage = async (obj)=>{
             data:error 
         }
     }
+    
 }
 
 export const saveMessages = async (arr)=>{
@@ -138,7 +143,6 @@ export const saveMessages = async (arr)=>{
         const query = `INSERT INTO chat (_id ,content ,fromUser ,toUser ,key, status, type,group_member, create_at) VALUES ${values}`
         try {
             const result = await trasaction(query); 
-            console.log(result, 'save mesage')
             return {
                 status:'succes',
                 data:result
@@ -197,11 +201,11 @@ export const getLastMesages = async (id)=>{
 }
 
 
-export const getMessages = async (id)=>{
-    const query = `SELECT * FROM chat WHERE group_member LIKE '%${id}%' ORDER BY create_at ASC `;
+export const getMessages = async (group)=>{
+    const query = `SELECT * FROM chat WHERE group_member='${group}' ORDER BY create_at ASC `;
     let result;
     try {
-        result = await dbConnection.executeSql(query); 
+        result = await trasaction(query); 
         // must be ordered later
         return {
             status:'succes',

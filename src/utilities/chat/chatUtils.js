@@ -20,7 +20,6 @@ const getInformationPartners = async (partners)=>{
 
 
 const getAllMessages = async (limitId=null)=>{
-    console.log(limitId, 'limit')
     const token = selectToken(store.getState());
     const fetchUtil = new fm(config.host+'/getMessages');
     const body = limitId === null ? undefined : {limitId}

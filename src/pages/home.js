@@ -127,7 +127,6 @@ const Home = ({route})=>{
       }
       
       lastMessageId = lastMessageObject.data.rows.length > 0 ? lastMessageObject.data.rows.item(0)._id : null
-      console.log(lastMessageObject, 'ULTIMO ID DE MESNAJE')
       let messages = []
       try {
         messages = await getAllMessages(lastMessageId);
@@ -155,9 +154,7 @@ const Home = ({route})=>{
     []
   )
 
-  const formatMessageObject = (partners,message)=>{
-
-  }
+ 
 
   return (
     <Stack.Navigator

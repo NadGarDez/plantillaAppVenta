@@ -10,12 +10,15 @@ import Icon from "react-native-vector-icons/FontAwesome"
 import HeaderSolo from "../components/headerSolo.js"
 import {setToken,unsetToken,selectToken} from "../reduxFiles/sessionSlice.js"
 import store from "../reduxFiles/store.js"
+import { useContext } from "react"
+import { WebSocketContext } from "../components/WebSocketPovider.js"
 const component = ({navigation,route})=>{
+  const socket = useContext(WebSocketContext)
     let dispatch = useDispatch()
     let close = ()=>{
-
-        dispatch(unsetToken())
-        route.params.refresh()
+        socket.disconnect();
+        dispatch(unsetToken());
+        route.params.refresh();
 
     }
     return(
