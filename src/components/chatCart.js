@@ -1,20 +1,15 @@
 import React from "react"
 import {View,StatusBar,Text,ScrollView,ImageBackground,Image,TouchableOpacity} from "react-native"
-import {Input} from "react-native-elements"
-import Button from "../components/buttonNad.js"
-import LinearGradient from 'react-native-linear-gradient';
-import Icon from "react-native-vector-icons/FontAwesome"
 const {flex} = require("../styles/flex.js")
 const {fonts} = require("../styles/fonts.js")
 const {colors}=require("../styles/colors.js")
-import {w,h} from "../utilities/sizes.js"
 
 const Component = ({item,navigation})=>{
   const {avatar,lastMessage, user,_id} = item
   return(
     <TouchableOpacity
       onPress={
-        ()=>navigation.navigate("conversation",{partnerId:_id})
+        ()=>navigation.navigate("conversation",{partnerId:_id, group_member:lastMessage.group_member})
       }
     >
     <View style={[flex.Row,flex.Wrap, {width:"100%",padding:5,borderStyle:"solid",borderWidth:0.3,borderTopColor:"white",borderBottomColor:"grey",borderLeftColor:"white",borderRightColor:"white"}]}>

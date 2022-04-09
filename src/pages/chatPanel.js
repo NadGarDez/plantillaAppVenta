@@ -7,28 +7,28 @@ import Tab from "../components/tabBar.js"
 const {flex} = require("../styles/flex.js")
 const {colors}=require("../styles/colors.js")
 import { WebSocketContext } from "../components/WebSocketPovider.js"
-import { getLastMesages, rowToArray } from "../utilities/db/dbManager.js"
+import { getLastMesages, getLastMessage, rowToArray, saveMessage, saveMessages } from "../utilities/db/dbManager.js"
 import { selectId } from "../reduxFiles/idSlice.js"
 import { socketEventSelect } from "../reduxFiles/socketEventSllice.js"
 import store from "../reduxFiles/store.js"
-import { getInformationPartners } from "../utilities/chat/chatUtils.js"
+import { getAllMessages, getInformationPartners } from "../utilities/chat/chatUtils.js"
 
-const component = (props)=>{
+const component = ({navigation})=>{
 
   const socketContext = useContext(WebSocketContext);
   const [conversations, setConversations] = useState(null); 
-  console.log(socketEventSelect(store.getState));
+  const [lastDate, setLastDate] = useState(null);
 
 
   const formatConversation = async (arr, id)=>{
      
     const partnersId = arr.map(
-      (item)=>item.fromUser === id ? item.toUser : fromUser
+      (item)=>item.fromUser === id ? item.toUser : item.fromUser
     )
     const partners = await getInformationPartners(partnersId);
     const conversation = arr.map(
       (item)=>{
-        const key = item.fromUser === id ? item.toUser : fromUser;
+        const key = item.fromUser === id ? item.toUser : item.fromUser;
         const {avatar,user,_id} = partners.data[key];
         return {lastMessage:item, avatar,user,_id}
       }
@@ -37,62 +37,58 @@ const component = (props)=>{
 
   }
 
-  useEffect(
-    async ()=>{
-
-      const myId = selectId(store.getState())
-
+  const printConversations = async (event) => {
+    const myId = selectId(store.getState())
+      if (event === false) {
+      
+        const lastId = await getLastMessage(selectId(store.getState()))
+        const newMessages = await getAllMessages(lastId.data.rows.length > 0 ? lastId.data.rows.item(0)._id : null);
+        const saveTrans = await saveMessages(newMessages.status !== 'error' ? newMessages.data : null);
+      }
       let messages = await getLastMesages(myId);
       messages = (messages.status !== 'error' && messages.data.rows.length > 0) ? rowToArray(messages.data.rows) : [];
       const conversation = await formatConversation(messages, myId);
-      console.log(conversation, 'format conversation')
       setConversations(conversation);
+  }
+
+  useEffect(
+    async ()=>{
+      await printConversations(false);
       const unsuscribe = store.subscribe(
         async ()=>{
-          const {name, data} = socketEventSelect(sore.getState);
+          const {name, data} = socketEventSelect(store.getState());
           switch (name) {
-            case 'chat/message':
-             
-              break;
-          
-            default:
+            case "chat/message":
+            case "chat/sendMessageResponse":
+            
+              await printConversations(true);
               break;
           }
         }
       )
 
       return unsuscribe
-      /*
-      const messages = await getAllMessages(null);
-      console.log(messages, 'mensajes');
-      const partnersId = Object.keys(messages.data);
-      console.log(partnersId);
-      const partners = await getInformationPartners(partnersId);
-      console.log(partners, 'partners');
-      // now save the messages and partners in the local db
-      let filterCon = [];
-
-      for (const key in partners.data) {
-        filterCon.push({
-            ...partners.data[key],
-            lastMessage:messages.data[key][0]
-        })
-          
-      }
-      console.log(filterCon, 'conversationsssssssssssssssssssssssssssssssssssssssssssssssss')
-      setConversations(filterCon);
-      */
+      
     },
     []
   )
 
 
+  useEffect(
+    async ()=>{
+      const unsubscribe = navigation.addListener('focus', async () => {
+        await printConversations(false);
+      });
+  
+      return unsubscribe;
+    },
+    [navigation]
+  )
 
   
   let dispatch = useDispatch();
 
 
-  //console.log(socket.connect, "socketttttttttttttttttttttt")
 
   return(
     <View style={[flex.column,flex.wrap,{backgroundColor:colors.customWhite,width:"100%"}]}>
@@ -102,12 +98,12 @@ const component = (props)=>{
         <FlatList
           style={{width:"100%",height:"86%"}}
           data={conversations}
-          renderItem={({item})=><CartChat item={item} navigation={props.navigation}/>}
+          renderItem={({item})=><CartChat item={item} navigation={navigation}/>}
         />
         )
       }
       
-      <Tab focus={[false,false,true,false,false]} display={true} navigation={props.navigation}/>
+      <Tab focus={[false,false,true,false,false]} display={true} navigation={navigation}/>
 
     </View>
   )
